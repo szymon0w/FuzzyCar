@@ -1,0 +1,60 @@
+FUNCTION_BLOCK
+
+VAR_INPUT
+velocity : REAL;
+close_to_left : REAL;
+close_to_right : REAL;
+END_VAR
+VAR_OUTPUT
+change_velocity : REAL;
+END_VAR
+FUZZIFY velocity
+TERM left := (-10, 1) (-8, 1) (-6, 1) (-4, 1) (-2, 0.50) (0, 0) ;
+TERM center := (-4, 0) (-2, 0.50) (0, 1) (2, 0.50) (4, 0);
+TERM right := (0, 0) (2, 0.50) (4, 1) (6, 1)  (8, 1) (10, 1) ;
+
+END_FUZZIFY
+
+FUZZIFY close_to_left
+TERM far :=  (10,0) (20,0.50) (30, 1) (40, 1) (50,1) (60, 1) (70, 1);
+TERM close := (0,1) (10,1) (20,1) (30, 1) (40, 0.50) (50, 0);
+END_FUZZIFY
+
+FUZZIFY close_to_right
+TERM far :=  (10,0) (20,0.50) (30, 1) (40, 1) (50,1) (60, 1) (70, 1);
+TERM close := (0,1) (10,1) (20,1) (30, 1) (40, 0.50) (50, 0);
+END_FUZZIFY
+
+DEFUZZIFY change_velocity
+TERM to_left := (-6, 1) (-4, 1) (-2, 0.50) (0, 0) (2, 0);
+TERM stay := (-4, 0) (-2, 0.50) (0, 1) (2, 0.50) (4, 0);
+TERM to_right := (-2, 0) (0, 0) (2, 0.50) (4, 1) (6, 1) ;
+METHOD : COG;
+DEFAULT := 0;
+END_DEFUZZIFY
+
+
+RULEBLOCK first
+AND: MIN;
+ACT: MIN;
+
+RULE 0: IF velocity IS left AND close_to_left IS far AND close_to_right IS far THEN change_velocity IS stay;
+RULE 1: IF velocity IS center AND close_to_left IS far AND close_to_right IS far THEN change_velocity IS stay;
+RULE 2: IF velocity IS right AND close_to_left IS far AND close_to_right IS far THEN change_velocity IS stay;
+
+RULE 3: IF velocity IS left AND close_to_left IS close AND close_to_right IS close THEN change_velocity IS to_right;
+RULE 4: IF velocity IS center AND close_to_left IS close AND close_to_right IS close THEN change_velocity IS stay;
+RULE 5: IF velocity IS right AND close_to_left IS close AND close_to_right IS close THEN change_velocity IS to_left;
+
+RULE 6: IF velocity IS left AND close_to_left IS far AND close_to_right IS close THEN change_velocity IS stay;
+RULE 7: IF velocity IS center AND close_to_left IS far AND close_to_right IS close THEN change_velocity IS to_left;
+RULE 8: IF velocity IS right AND close_to_left IS far AND close_to_right IS close THEN change_velocity IS to_left;
+
+RULE 9: IF velocity IS left AND close_to_left IS close AND close_to_right IS far THEN change_velocity IS to_right;
+RULE 10: IF velocity IS center AND close_to_left IS close AND close_to_right IS far THEN change_velocity IS to_right;
+RULE 11: IF velocity IS right AND close_to_left IS close AND close_to_right IS far THEN change_velocity IS stay;
+
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
